@@ -10,7 +10,8 @@ public interface AuthorizeOrganizationUseCase {
         MANAGE_PARTIES,
         VIEW_PARTIES,
         MANAGE_PROCESSES,
-        VIEW_PROCESSES
+        VIEW_PROCESSES,
+        AUTHORIZE_WORKFLOW_EXCEPTION
     }
 
     record AuthorizedActor(UUID userId, UUID organizationId) {}

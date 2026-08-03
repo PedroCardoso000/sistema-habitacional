@@ -133,7 +133,7 @@ public final class FinancingProcessService {
         Instant now = time.now();
         try {
             mutation.apply(process, actor.userId(), now);
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | IllegalStateException exception) {
             throw ProcessExceptions.invalid(exception.getMessage());
         }
         process = processes.update(process, expectedVersion);

@@ -9,6 +9,7 @@ public enum Role {
             Permission.VIEW_PARTIES,
             Permission.MANAGE_PROCESSES,
             Permission.VIEW_PROCESSES,
+            Permission.AUTHORIZE_WORKFLOW_EXCEPTION,
             Permission.VIEW_CURRENT_CONTEXT), true),
     ANALYST(Set.of(
             Permission.MANAGE_PARTIES,

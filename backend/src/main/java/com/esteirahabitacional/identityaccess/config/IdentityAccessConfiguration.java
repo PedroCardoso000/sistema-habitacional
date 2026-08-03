@@ -8,6 +8,7 @@ import com.esteirahabitacional.identityaccess.application.port.out.CurrentActorP
 import com.esteirahabitacional.identityaccess.application.port.out.UserRepository;
 import com.esteirahabitacional.identityaccess.application.service.AuthorizationService;
 import com.esteirahabitacional.identityaccess.application.service.GetCurrentUserContextService;
+import com.esteirahabitacional.identityaccess.application.service.InternalUserReferenceService;
 import com.esteirahabitacional.identityaccess.application.service.ProvisionInitialAdministratorService;
 import com.esteirahabitacional.identityaccess.application.service.UserAdministrationService;
 import com.esteirahabitacional.shared.CurrentTimeProvider;
@@ -37,6 +38,11 @@ class IdentityAccessConfiguration {
     @Bean
     AuthorizationService authorizationService(CurrentActorProvider actors, UserRepository users) {
         return new AuthorizationService(actors, users);
+    }
+
+    @Bean
+    InternalUserReferenceService internalUserReferenceService(UserRepository users) {
+        return new InternalUserReferenceService(users);
     }
 
     @Bean

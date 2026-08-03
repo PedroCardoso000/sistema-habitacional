@@ -13,6 +13,7 @@ public final class FinancingProcess {
     private final String processNumber;
     private final UUID organizationId;
     private final ProcessOrigin origin;
+    private final ProcessStatus status;
     private final UUID authorUserId;
     private final UUID brokerId;
     private final UUID responsibleUserId;
@@ -25,6 +26,7 @@ public final class FinancingProcess {
     private Instant updatedAt;
 
     private FinancingProcess(UUID id, String processNumber, UUID organizationId, ProcessOrigin origin,
+            ProcessStatus status,
             UUID authorUserId, UUID brokerId, UUID responsibleUserId, UUID mainClientId,
             ProcessPriority priority, Set<ProcessParticipant> participants,
             List<PropertyAssociation> propertyHistory, long version, Instant createdAt, Instant updatedAt) {
@@ -32,6 +34,7 @@ public final class FinancingProcess {
         this.processNumber = required(processNumber, "processNumber");
         this.organizationId = Objects.requireNonNull(organizationId, "organizationId is required");
         this.origin = Objects.requireNonNull(origin, "origin is required");
+        this.status = Objects.requireNonNull(status, "status is required");
         this.authorUserId = Objects.requireNonNull(authorUserId, "authorUserId is required");
         this.responsibleUserId = Objects.requireNonNull(responsibleUserId, "responsibleUserId is required");
         if (origin == ProcessOrigin.BROKER && brokerId == null) {
@@ -59,37 +62,41 @@ public final class FinancingProcess {
         if (mainClientId != null) {
             initial.add(new ProcessParticipant(ParticipantType.CLIENT, mainClientId));
         }
-        return new FinancingProcess(id, number, organizationId, origin, authorUserId, brokerId,
+        return new FinancingProcess(id, number, organizationId, origin, ProcessStatus.DRAFT, authorUserId, brokerId,
                 authorUserId, mainClientId, ProcessPriority.NORMAL, initial, List.of(), 0, occurredAt, occurredAt);
     }
 
     public static FinancingProcess restore(UUID id, String number, UUID organizationId, ProcessOrigin origin,
-            UUID authorUserId, UUID brokerId, UUID responsibleUserId, UUID mainClientId,
+            ProcessStatus status, UUID authorUserId, UUID brokerId, UUID responsibleUserId, UUID mainClientId,
             ProcessPriority priority, Set<ProcessParticipant> participants,
             List<PropertyAssociation> propertyHistory, long version, Instant createdAt, Instant updatedAt) {
-        return new FinancingProcess(id, number, organizationId, origin, authorUserId, brokerId,
+        return new FinancingProcess(id, number, organizationId, origin, status, authorUserId, brokerId,
                 responsibleUserId, mainClientId, priority, participants, propertyHistory, version, createdAt, updatedAt);
     }
 
     public void defineMainClient(UUID clientId, Instant occurredAt) {
+        ensureDraft();
         mainClientId = Objects.requireNonNull(clientId, "clientId is required");
         participants.add(new ProcessParticipant(ParticipantType.CLIENT, clientId));
         touch(occurredAt);
     }
 
     public void associateParticipant(ProcessParticipant participant, Instant occurredAt) {
+        ensureDraft();
         participants.add(Objects.requireNonNull(participant, "participant is required"));
         touch(occurredAt);
     }
 
     public void associateProperty(String addressLine, String city, String state, String postalCode,
             UUID actorId, Instant occurredAt) {
+        ensureDraft();
         propertyHistory.add(new PropertyAssociation(propertyHistory.size() + 1, addressLine, city,
                 state, postalCode, actorId, occurredAt));
         touch(occurredAt);
     }
 
     public void changePriority(ProcessPriority newPriority, Instant occurredAt) {
+        ensureDraft();
         priority = Objects.requireNonNull(newPriority, "priority is required");
         touch(occurredAt);
     }
@@ -102,7 +109,7 @@ public final class FinancingProcess {
     public String processNumber() { return processNumber; }
     public UUID organizationId() { return organizationId; }
     public ProcessOrigin origin() { return origin; }
-    public ProcessStatus status() { return ProcessStatus.DRAFT; }
+    public ProcessStatus status() { return status; }
     public UUID authorUserId() { return authorUserId; }
     public UUID brokerId() { return brokerId; }
     public UUID responsibleUserId() { return responsibleUserId; }
@@ -116,6 +123,11 @@ public final class FinancingProcess {
     public void persistedAtVersion(long persistedVersion) { version = persistedVersion; }
 
     private void touch(Instant occurredAt) { updatedAt = Objects.requireNonNull(occurredAt, "occurredAt is required"); }
+    private void ensureDraft() {
+        if (status != ProcessStatus.DRAFT) {
+            throw new IllegalStateException("Only draft processes can be edited by draft operations");
+        }
+    }
     private static String required(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " is required");

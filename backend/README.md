@@ -85,6 +85,21 @@ Endpoints internos para gestores e analistas:
 
 Alterações recebem `expectedVersion` e retornam `409` quando o rascunho foi modificado por outra operação. O imóvel é opcional e cada substituição preserva o histórico. Rascunhos não possuem workflow, etapa, próxima ação ou visibilidade para corretor e cliente.
 
+## Workflow operacional
+
+Endpoints internos:
+
+- `PUT /api/organizations/{organizationId}/workflow/models/initial`
+- `GET /api/organizations/{organizationId}/processes/{processId}/workflow`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/workflow/advance`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/workflow/return`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/workflow/exception`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/workflow/block`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/workflow/unblock`
+- `PUT /api/organizations/{organizationId}/processes/{processId}/workflow/next-action`
+
+O fluxo inicial v1 possui seis etapas ordenadas. Avanços respeitam critérios obrigatórios configurados; retornos e saltos exigem justificativa e permissão elevada de gestor. Mudanças preservam histórico imutável e usam `expectedVersion`. Não existe endpoint para inicializar uma jornada: o contrato interno `InitializeWorkflowForSubmissionUseCase` somente aceita processo `ACTIVE` e será coordenado pela submissão atômica do Prompt 005.
+
 ## Bootstrap inicial
 
 O provisionamento da primeira empresa e do administrador da plataforma não é endpoint HTTP. Para executá-lo uma única vez, configure as variáveis abaixo e inicie a aplicação:
@@ -114,4 +129,4 @@ Credenciais padrão existem somente para desenvolvimento local. Ambientes reais 
 
 ## Limites atuais
 
-Não existem autenticação federada real, entidades de processo, storage de documentos ou notificações. Clientes, corretores e imobiliárias pertencem exclusivamente à empresa que os cadastrou; ainda não existem vínculos com processos. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.
+Não existem autenticação federada real, submissão pública, checklist documental, storage de documentos ou notificações. Processos continuam sendo criados como rascunhos; o workflow operacional só pode ser inicializado pelo contrato interno de submissão quando o processo já estiver ativo. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.

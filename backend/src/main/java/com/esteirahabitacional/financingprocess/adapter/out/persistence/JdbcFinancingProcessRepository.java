@@ -101,7 +101,9 @@ public final class JdbcFinancingProcessRepository implements FinancingProcessRep
                         row.getString("postal_code"), row.getObject("associated_by", UUID.class),
                         row.getObject("associated_at", OffsetDateTime.class).toInstant())).list();
         return FinancingProcess.restore(id, result.getString("process_number"), organizationId,
-                ProcessOrigin.valueOf(result.getString("origin")), result.getObject("author_user_id", UUID.class),
+                ProcessOrigin.valueOf(result.getString("origin")),
+                com.esteirahabitacional.financingprocess.domain.model.ProcessStatus.valueOf(
+                        result.getString("status")), result.getObject("author_user_id", UUID.class),
                 result.getObject("broker_id", UUID.class), result.getObject("responsible_user_id", UUID.class),
                 result.getObject("main_client_id", UUID.class), ProcessPriority.valueOf(result.getString("priority")),
                 participants, history, result.getLong("version"),
@@ -127,7 +129,7 @@ public final class JdbcFinancingProcessRepository implements FinancingProcessRep
     }
 
     private String baseSelect() {
-        return "SELECT id, organization_id, process_number, origin, author_user_id, broker_id, "
+        return "SELECT id, organization_id, process_number, origin, status, author_user_id, broker_id, "
                 + "responsible_user_id, main_client_id, priority, version, created_at, updated_at "
                 + "FROM financing_processes";
     }
