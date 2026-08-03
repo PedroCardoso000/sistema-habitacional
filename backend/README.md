@@ -71,6 +71,20 @@ Os valores de `type` são `CLIENT`, `BROKER` ou `AGENCY`; para alteração de st
 
 O contrato detalhado, incluindo requests, responses e erros RFC 9457, é gerado em `GET /v3/api-docs`.
 
+## Rascunhos de financiamento
+
+Endpoints internos para gestores e analistas:
+
+- `POST /api/organizations/{organizationId}/processes`
+- `GET /api/organizations/{organizationId}/processes`
+- `GET /api/organizations/{organizationId}/processes/{processId}`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/main-client`
+- `PUT /api/organizations/{organizationId}/processes/{processId}/participants`
+- `PUT /api/organizations/{organizationId}/processes/{processId}/property`
+- `PATCH /api/organizations/{organizationId}/processes/{processId}/priority`
+
+Alterações recebem `expectedVersion` e retornam `409` quando o rascunho foi modificado por outra operação. O imóvel é opcional e cada substituição preserva o histórico. Rascunhos não possuem workflow, etapa, próxima ação ou visibilidade para corretor e cliente.
+
 ## Bootstrap inicial
 
 O provisionamento da primeira empresa e do administrador da plataforma não é endpoint HTTP. Para executá-lo uma única vez, configure as variáveis abaixo e inicie a aplicação:

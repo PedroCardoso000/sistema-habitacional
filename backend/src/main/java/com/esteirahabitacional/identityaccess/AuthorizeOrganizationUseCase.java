@@ -8,7 +8,9 @@ public interface AuthorizeOrganizationUseCase {
 
     enum Action {
         MANAGE_PARTIES,
-        VIEW_PARTIES
+        VIEW_PARTIES,
+        MANAGE_PROCESSES,
+        VIEW_PROCESSES
     }
 
     record AuthorizedActor(UUID userId, UUID organizationId) {}
