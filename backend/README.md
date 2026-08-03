@@ -100,6 +100,29 @@ Endpoints internos:
 
 O fluxo inicial v1 possui seis etapas ordenadas. Avanços respeitam critérios obrigatórios configurados; retornos e saltos exigem justificativa e permissão elevada de gestor. Mudanças preservam histórico imutável e usam `expectedVersion`. Não existe endpoint para inicializar uma jornada: o contrato interno `InitializeWorkflowForSubmissionUseCase` somente aceita processo `ACTIVE` e será coordenado pela submissão atômica do Prompt 005.
 
+## Documentos e submissão
+
+Endpoints principais:
+
+- `POST /api/organizations/{organizationId}/processes/{processId}/submission`
+- `GET /api/organizations/{organizationId}/processes/{processId}/documents`
+- `POST /api/organizations/{organizationId}/processes/{processId}/document-requests`
+- `POST /api/organizations/{organizationId}/document-requests/{requestId}/uploads`
+- `POST /api/organizations/{organizationId}/uploads/{uploadId}/complete`
+- `PATCH /api/organizations/{organizationId}/document-requests/{requestId}/review`
+- `PATCH /api/organizations/{organizationId}/document-requests/{requestId}/approval`
+- `PATCH /api/organizations/{organizationId}/document-requests/{requestId}/rejection`
+- `PATCH /api/organizations/{organizationId}/document-requests/{requestId}/resubmission`
+- `POST /api/organizations/{organizationId}/document-versions/{versionId}/downloads`
+
+A submissão exige cliente principal e imóvel, ativa o rascunho, inicializa o workflow em `INITIAL_REVIEW`,
+gera o checklist e define a próxima ação na mesma transação. Arquivos são enviados por intenção temporária,
+confirmados contra metadados do storage privado e baixados por autorização temporária de uso único. Chaves
+de objeto usam apenas UUIDs. O job de limpeza remove intenções e objetos órfãos expirados de forma idempotente.
+
+O storage local privado usa `DOCUMENTS_STORAGE_ROOT`; sem configuração, grava em diretório privado dentro do
+temporário do sistema operacional. Produção deve apontar essa propriedade para volume privado persistente.
+
 ## Bootstrap inicial
 
 O provisionamento da primeira empresa e do administrador da plataforma não é endpoint HTTP. Para executá-lo uma única vez, configure as variáveis abaixo e inicie a aplicação:
@@ -124,9 +147,13 @@ Após o sucesso, desabilite `BOOTSTRAP_EXECUTE` e remova os segredos do ambiente
 | `DATABASE_USERNAME` | `esteira` |
 | `DATABASE_PASSWORD` | `esteira` |
 | `PLATFORM_ORGANIZATION_CREATION_ENABLED` | `false` |
+| `DOCUMENTS_STORAGE_ROOT` | diretório privado no temporário do sistema |
 
 Credenciais padrão existem somente para desenvolvimento local. Ambientes reais devem injetar segredos externamente.
 
 ## Limites atuais
 
-Não existem autenticação federada real, submissão pública, checklist documental, storage de documentos ou notificações. Processos continuam sendo criados como rascunhos; o workflow operacional só pode ser inicializado pelo contrato interno de submissão quando o processo já estiver ativo. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.
+Não existem autenticação federada real, submissão pública, notificações ou integração com storage de nuvem.
+O adapter atual usa filesystem privado configurável e URLs internas temporárias; ambientes com múltiplas instâncias
+precisarão substituir essa porta por armazenamento privado compartilhado. O Event Publication Registry garante
+entrega aos listeners transacionais registrados; não é event store nem timeline.

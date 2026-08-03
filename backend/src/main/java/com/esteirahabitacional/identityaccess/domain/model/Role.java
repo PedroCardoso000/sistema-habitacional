@@ -9,6 +9,8 @@ public enum Role {
             Permission.VIEW_PARTIES,
             Permission.MANAGE_PROCESSES,
             Permission.VIEW_PROCESSES,
+            Permission.MANAGE_DOCUMENTS,
+            Permission.VIEW_DOCUMENTS,
             Permission.AUTHORIZE_WORKFLOW_EXCEPTION,
             Permission.VIEW_CURRENT_CONTEXT), true),
     ANALYST(Set.of(
@@ -16,6 +18,8 @@ public enum Role {
             Permission.VIEW_PARTIES,
             Permission.MANAGE_PROCESSES,
             Permission.VIEW_PROCESSES,
+            Permission.MANAGE_DOCUMENTS,
+            Permission.VIEW_DOCUMENTS,
             Permission.VIEW_CURRENT_CONTEXT), true),
     BROKER(Set.of(Permission.VIEW_CURRENT_CONTEXT), false),
     CLIENT(Set.of(Permission.VIEW_CURRENT_CONTEXT), false),

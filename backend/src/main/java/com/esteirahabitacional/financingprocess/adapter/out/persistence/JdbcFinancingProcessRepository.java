@@ -49,9 +49,11 @@ public final class JdbcFinancingProcessRepository implements FinancingProcessRep
     @Override
     public FinancingProcess update(FinancingProcess process, long expectedVersion) {
         int changed = jdbc.sql("UPDATE financing_processes SET main_client_id = :client, priority = :priority, "
+                        + "status = :status, "
                         + "version = version + 1, updated_at = :updatedAt WHERE organization_id = :organizationId "
                         + "AND id = :id AND version = :expectedVersion")
                 .param("client", process.mainClientId()).param("priority", process.priority().name())
+                .param("status", process.status().name())
                 .param("updatedAt", time(process.updatedAt())).param("organizationId", process.organizationId())
                 .param("id", process.id()).param("expectedVersion", expectedVersion).update();
         if (changed == 0) {

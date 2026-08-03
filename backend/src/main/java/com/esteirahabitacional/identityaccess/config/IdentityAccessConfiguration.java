@@ -2,7 +2,6 @@ package com.esteirahabitacional.identityaccess.config;
 
 import com.esteirahabitacional.identityaccess.adapter.in.web.DevHeaderCurrentActorProvider;
 import com.esteirahabitacional.identityaccess.adapter.out.persistence.JdbcUserRepository;
-import com.esteirahabitacional.identityaccess.application.port.in.GetCurrentUserContextUseCase;
 import com.esteirahabitacional.identityaccess.ProvisionInitialAdministratorUseCase;
 import com.esteirahabitacional.identityaccess.application.port.out.CurrentActorProvider;
 import com.esteirahabitacional.identityaccess.application.port.out.UserRepository;
@@ -94,7 +93,7 @@ class IdentityAccessConfiguration {
     }
 
     @Bean
-    GetCurrentUserContextUseCase getCurrentUserContextUseCase(
+    GetCurrentUserContextService getCurrentUserContextUseCase(
             CurrentActorProvider actors, UserRepository users) {
         return new GetCurrentUserContextService(actors, users);
     }

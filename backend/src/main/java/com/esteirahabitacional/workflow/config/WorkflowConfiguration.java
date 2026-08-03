@@ -7,6 +7,7 @@ import com.esteirahabitacional.shared.CurrentTimeProvider;
 import com.esteirahabitacional.shared.DomainEventPublisher;
 import com.esteirahabitacional.shared.IdentifierGenerator;
 import com.esteirahabitacional.workflow.InitializeWorkflowForSubmissionUseCase;
+import com.esteirahabitacional.workflow.DefineNextActionForSubmissionUseCase;
 import com.esteirahabitacional.workflow.adapter.out.persistence.JdbcWorkflowAudit;
 import com.esteirahabitacional.workflow.adapter.out.persistence.JdbcWorkflowRepository;
 import com.esteirahabitacional.workflow.application.port.in.EnsureInitialWorkflowModelUseCase;
@@ -45,6 +46,15 @@ class WorkflowConfiguration {
     InitializeWorkflowForSubmissionUseCase initializeWorkflowForSubmissionUseCase(
             WorkflowService service, TransactionTemplate transactions) {
         return command -> transactions.execute(status -> service.initialize(command));
+    }
+
+    @Bean
+    DefineNextActionForSubmissionUseCase defineNextActionForSubmissionUseCase(
+            WorkflowService service, TransactionTemplate transactions) {
+        return command -> transactions.executeWithoutResult(status -> service.defineNextAction(
+                new ManageWorkflowJourneyUseCase.NextActionCommand(command.organizationId(),
+                        command.processId(), command.description(), command.responsibleUserId(),
+                        command.dueAt(), command.expectedWorkflowVersion())));
     }
 
     @Bean

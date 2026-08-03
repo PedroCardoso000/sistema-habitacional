@@ -1,12 +1,13 @@
 package com.esteirahabitacional.identityaccess.application.service;
 
 import com.esteirahabitacional.identityaccess.application.port.in.GetCurrentUserContextUseCase;
+import com.esteirahabitacional.identityaccess.CurrentActorContextUseCase;
 import com.esteirahabitacional.identityaccess.application.port.out.CurrentActorProvider;
 import com.esteirahabitacional.identityaccess.application.port.out.UserRepository;
 import com.esteirahabitacional.identityaccess.domain.model.Permission;
 import com.esteirahabitacional.identityaccess.domain.model.User;
 
-public class GetCurrentUserContextService implements GetCurrentUserContextUseCase {
+public class GetCurrentUserContextService implements GetCurrentUserContextUseCase, CurrentActorContextUseCase {
 
     private final CurrentActorProvider actors;
     private final UserRepository users;
@@ -27,5 +28,12 @@ public class GetCurrentUserContextService implements GetCurrentUserContextUseCas
         return new Result(
                 user.id(), user.organizationId(), user.email().value(), user.displayName(),
                 user.role(), user.status());
+    }
+
+    @Override
+    public CurrentActorContextUseCase.Actor current() {
+        Result result = execute();
+        return new CurrentActorContextUseCase.Actor(result.userId(), result.organizationId(),
+                CurrentActorContextUseCase.Role.valueOf(result.role().name()));
     }
 }

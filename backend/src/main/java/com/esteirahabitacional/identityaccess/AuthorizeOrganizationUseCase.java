@@ -11,6 +11,8 @@ public interface AuthorizeOrganizationUseCase {
         VIEW_PARTIES,
         MANAGE_PROCESSES,
         VIEW_PROCESSES,
+        MANAGE_DOCUMENTS,
+        VIEW_DOCUMENTS,
         AUTHORIZE_WORKFLOW_EXCEPTION
     }
 

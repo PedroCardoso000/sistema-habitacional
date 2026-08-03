@@ -13,7 +13,7 @@ public final class FinancingProcess {
     private final String processNumber;
     private final UUID organizationId;
     private final ProcessOrigin origin;
-    private final ProcessStatus status;
+    private ProcessStatus status;
     private final UUID authorUserId;
     private final UUID brokerId;
     private final UUID responsibleUserId;
@@ -98,6 +98,18 @@ public final class FinancingProcess {
     public void changePriority(ProcessPriority newPriority, Instant occurredAt) {
         ensureDraft();
         priority = Objects.requireNonNull(newPriority, "priority is required");
+        touch(occurredAt);
+    }
+
+    public void activateForSubmission(Instant occurredAt) {
+        ensureDraft();
+        if (mainClientId == null) {
+            throw new IllegalStateException("Main client is required for submission");
+        }
+        if (propertyHistory.isEmpty()) {
+            throw new IllegalStateException("Property is required for submission");
+        }
+        status = ProcessStatus.ACTIVE;
         touch(occurredAt);
     }
 

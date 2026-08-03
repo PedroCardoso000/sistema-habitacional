@@ -10,6 +10,8 @@ import com.esteirahabitacional.financingprocess.application.port.out.ProcessAudi
 import com.esteirahabitacional.financingprocess.application.port.out.ProcessNumberGenerator;
 import com.esteirahabitacional.financingprocess.application.service.FinancingProcessService;
 import com.esteirahabitacional.financingprocess.application.service.ProcessWorkflowReferenceService;
+import com.esteirahabitacional.financingprocess.application.service.ProcessDocumentReferenceService;
+import com.esteirahabitacional.financingprocess.ActivateDraftForSubmissionUseCase;
 import com.esteirahabitacional.identityaccess.AuthorizeOrganizationUseCase;
 import com.esteirahabitacional.parties.BrokerReferenceLookup;
 import com.esteirahabitacional.parties.ClientReferenceLookup;
@@ -33,6 +35,12 @@ class FinancingProcessConfiguration {
     @Bean ProcessAudit processAudit(JdbcClient jdbc) { return new JdbcProcessAudit(jdbc); }
     @Bean ProcessWorkflowReferenceService processWorkflowReferenceService(FinancingProcessRepository processes) {
         return new ProcessWorkflowReferenceService(processes);
+    }
+    @Bean ProcessDocumentReferenceService processDocumentReferenceService(FinancingProcessRepository processes) {
+        return new ProcessDocumentReferenceService(processes);
+    }
+    @Bean ActivateDraftForSubmissionUseCase activateDraftForSubmissionUseCase(FinancingProcessService service) {
+        return service::activateForSubmission;
     }
 
     @Bean

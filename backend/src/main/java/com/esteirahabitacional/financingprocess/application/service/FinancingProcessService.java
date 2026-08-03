@@ -15,6 +15,8 @@ import com.esteirahabitacional.financingprocess.application.port.out.FinancingPr
 import com.esteirahabitacional.financingprocess.application.port.out.ProcessAudit;
 import com.esteirahabitacional.financingprocess.application.port.out.ProcessNumberGenerator;
 import com.esteirahabitacional.financingprocess.domain.event.FinancingProcessDraftCreated;
+import com.esteirahabitacional.financingprocess.domain.event.FinancingProcessSubmitted;
+import com.esteirahabitacional.financingprocess.ActivateDraftForSubmissionUseCase;
 import com.esteirahabitacional.financingprocess.domain.model.FinancingProcess;
 import com.esteirahabitacional.financingprocess.domain.model.ParticipantType;
 import com.esteirahabitacional.financingprocess.domain.model.ProcessParticipant;
@@ -106,6 +108,26 @@ public final class FinancingProcessService {
     public Result changePriority(PriorityCommand command) {
         return mutate(command.organizationId(), command.processId(), command.expectedVersion(), "PRIORITY_CHANGED",
                 (process, actor, now) -> process.changePriority(command.priority(), now));
+    }
+
+    public ActivateDraftForSubmissionUseCase.Result activateForSubmission(
+            ActivateDraftForSubmissionUseCase.Command command) {
+        FinancingProcess process = load(command.organizationId(), command.processId());
+        if (process.version() != command.expectedVersion()) {
+            throw ProcessExceptions.conflict();
+        }
+        Instant now = time.now();
+        try {
+            process.activateForSubmission(now);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            throw ProcessExceptions.invalid(exception.getMessage());
+        }
+        process = processes.update(process, command.expectedVersion());
+        audit.record(command.organizationId(), process.id(), command.actorId(), "PROCESS_SUBMITTED", now);
+        events.publish(List.of(new FinancingProcessSubmitted(process.id(), process.organizationId(),
+                command.actorId(), now)));
+        return new ActivateDraftForSubmissionUseCase.Result(process.id(), process.organizationId(),
+                process.responsibleUserId(), process.mainClientId(), process.version());
     }
 
     public Detail find(UUID organizationId, UUID processId) {
