@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: esteira_habitacional
+      POSTGRES_USER: esteira
+      POSTGRES_PASSWORD: esteira
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U esteira -d esteira_habitacional"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - esteira-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  esteira-postgres-data:
+
