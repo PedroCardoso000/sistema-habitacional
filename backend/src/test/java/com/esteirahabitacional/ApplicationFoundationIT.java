@@ -31,7 +31,7 @@ class ApplicationFoundationIT {
 
     @Test
     void shouldApplyAllMigrationsToPostgresql() {
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("001");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("002");
         Integer tableCount = jdbcTemplate.queryForObject(
                 "SELECT count(*) FROM information_schema.tables "
                         + "WHERE table_schema = 'public' AND table_name = 'event_publication'",
@@ -55,4 +55,3 @@ class ApplicationFoundationIT {
                 .andExpect(jsonPath("$.info.version").value("v1"));
     }
 }
-

@@ -1,6 +1,7 @@
 package com.esteirahabitacional.shared.adapter.in.web.error;
 
 import com.esteirahabitacional.shared.adapter.in.web.CorrelationIdFilter;
+import com.esteirahabitacional.shared.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
@@ -67,6 +68,16 @@ public class ApiExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(ApplicationException.class)
+    ProblemDetail handleApplication(ApplicationException exception, HttpServletRequest request) {
+        return createProblem(
+                HttpStatus.valueOf(exception.status()),
+                exception.code(),
+                exception.title(),
+                exception.getMessage(),
+                request);
+    }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception exception, HttpServletRequest request) {
         LOGGER.error("Unexpected request failure", exception);
@@ -101,4 +112,3 @@ public class ApiExceptionHandler {
 
     record Violation(String field, String code, String message) {}
 }
-

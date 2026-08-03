@@ -40,3 +40,14 @@ logging:
     format:
       console: logstash
 
+app:
+  bootstrap:
+    enabled: ${BOOTSTRAP_ENABLED:false}
+    execute: ${BOOTSTRAP_EXECUTE:false}
+    expected-secret: ${BOOTSTRAP_EXPECTED_SECRET:}
+    supplied-secret: ${BOOTSTRAP_SUPPLIED_SECRET:}
+    organization-name: ${BOOTSTRAP_ORGANIZATION_NAME:}
+    administrator-email: ${BOOTSTRAP_ADMINISTRATOR_EMAIL:}
+    administrator-display-name: ${BOOTSTRAP_ADMINISTRATOR_DISPLAY_NAME:}
+  platform-administration:
+    organization-creation-enabled: ${PLATFORM_ORGANIZATION_CREATION_ENABLED:false}

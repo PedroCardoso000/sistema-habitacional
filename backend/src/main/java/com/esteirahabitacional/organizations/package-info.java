@@ -1,3 +1,4 @@
-@org.springframework.modulith.ApplicationModule(displayName = "Organizations")
+@org.springframework.modulith.ApplicationModule(
+        displayName = "Organizations",
+        allowedDependencies = "shared")
 package com.esteirahabitacional.organizations;
-

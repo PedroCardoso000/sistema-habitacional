@@ -1,6 +1,6 @@
 # Backend — Esteira Habitacional
 
-Fundação Java do monólito modular da Esteira Habitacional, implementada conforme a SPEC 000.
+Backend modular da Esteira Habitacional, implementado a partir das especificações de entrega do MVP.
 
 ## Requisitos
 
@@ -38,6 +38,42 @@ Endpoints técnicos:
 - `GET /actuator/health/readiness`
 - `GET /v3/api-docs`
 
+## Contexto autenticado temporário
+
+Durante o desenvolvimento, os endpoints funcionais recebem o contexto técnico pelos headers:
+
+- `X-User-Id`: UUID do usuário;
+- `X-Organization-Id`: UUID da empresa do vínculo ativo.
+
+Esses headers não concedem acesso por si mesmos. O backend recupera o usuário com escopo explícito de empresa e revalida status, papel e permissão. O adapter está isolado para futura substituição por um provedor de identidade real.
+
+Endpoints da entrega de identidade e autorização:
+
+- `GET /api/identity/context`
+- `POST /api/organizations/{organizationId}/users`
+- `PATCH /api/organizations/{organizationId}/users/{userId}/role`
+- `POST /api/organizations/{organizationId}/users/{userId}/suspension`
+- `POST /api/organizations/{organizationId}/users/{userId}/revocation`
+- `POST /api/platform/organizations`
+
+O contrato detalhado, incluindo requests, responses e erros RFC 9457, é gerado em `GET /v3/api-docs`.
+
+## Bootstrap inicial
+
+O provisionamento da primeira empresa e do administrador da plataforma não é endpoint HTTP. Para executá-lo uma única vez, configure as variáveis abaixo e inicie a aplicação:
+
+```text
+BOOTSTRAP_ENABLED=true
+BOOTSTRAP_EXECUTE=true
+BOOTSTRAP_EXPECTED_SECRET=<segredo-configurado-no-ambiente>
+BOOTSTRAP_SUPPLIED_SECRET=<segredo-fornecido-ao-comando>
+BOOTSTRAP_ORGANIZATION_NAME=<nome-da-primeira-empresa>
+BOOTSTRAP_ADMINISTRATOR_EMAIL=<email-do-administrador>
+BOOTSTRAP_ADMINISTRATOR_DISPLAY_NAME=<nome-do-administrador>
+```
+
+Após o sucesso, desabilite `BOOTSTRAP_EXECUTE` e remova os segredos do ambiente. O banco impede repetição do provisionamento e execuções concorrentes são serializadas por lock transacional.
+
 ## Configuração
 
 | Variável | Padrão local |
@@ -45,10 +81,10 @@ Endpoints técnicos:
 | `DATABASE_URL` | `jdbc:postgresql://localhost:5432/esteira_habitacional` |
 | `DATABASE_USERNAME` | `esteira` |
 | `DATABASE_PASSWORD` | `esteira` |
+| `PLATFORM_ORGANIZATION_CREATION_ENABLED` | `false` |
 
 Credenciais padrão existem somente para desenvolvimento local. Ambientes reais devem injetar segredos externamente.
 
-## Limites desta entrega
+## Limites atuais
 
-Não existem autenticação real, entidades de negócio, storage de documentos, notificações ou endpoints funcionais do produto. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.
-
+Não existem autenticação federada real, entidades de processo, storage de documentos ou notificações. Corretor, cliente e vendedor estão representados como papéis, mas seus cadastros e vínculos funcionais não são criados nesta entrega. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.
