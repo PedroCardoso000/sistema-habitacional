@@ -1,13 +1,14 @@
 package com.esteirahabitacional.identityaccess.application.service;
 
 import com.esteirahabitacional.identityaccess.AuthorizePlatformAdministrationUseCase;
+import com.esteirahabitacional.identityaccess.AuthorizeOrganizationUseCase;
 import com.esteirahabitacional.identityaccess.application.port.out.CurrentActorProvider;
 import com.esteirahabitacional.identityaccess.application.port.out.UserRepository;
 import com.esteirahabitacional.identityaccess.domain.model.Permission;
 import com.esteirahabitacional.identityaccess.domain.model.User;
 import java.util.UUID;
 
-public class AuthorizationService implements AuthorizePlatformAdministrationUseCase {
+public class AuthorizationService implements AuthorizePlatformAdministrationUseCase, AuthorizeOrganizationUseCase {
 
     private final CurrentActorProvider actors;
     private final UserRepository users;
@@ -31,9 +32,16 @@ public class AuthorizationService implements AuthorizePlatformAdministrationUseC
     }
 
     @Override
-    public AuthorizedActor requireOrganizationCreationPermission() {
+    public AuthorizePlatformAdministrationUseCase.AuthorizedActor requireOrganizationCreationPermission() {
         CurrentActorProvider.Actor actor = actors.current();
         require(actor.organizationId(), Permission.CREATE_ORGANIZATION);
-        return new AuthorizedActor(actor.userId(), actor.organizationId());
+        return new AuthorizePlatformAdministrationUseCase.AuthorizedActor(
+                actor.userId(), actor.organizationId());
+    }
+
+    @Override
+    public AuthorizeOrganizationUseCase.AuthorizedActor require(UUID organizationId, Action action) {
+        User user = require(organizationId, Permission.valueOf(action.name()));
+        return new AuthorizeOrganizationUseCase.AuthorizedActor(user.id(), user.organizationId());
     }
 }

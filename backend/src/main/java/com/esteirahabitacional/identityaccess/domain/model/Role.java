@@ -3,8 +3,15 @@ package com.esteirahabitacional.identityaccess.domain.model;
 import java.util.Set;
 
 public enum Role {
-    MANAGER(Set.of(Permission.MANAGE_INTERNAL_USERS, Permission.VIEW_CURRENT_CONTEXT), true),
-    ANALYST(Set.of(Permission.VIEW_CURRENT_CONTEXT), true),
+    MANAGER(Set.of(
+            Permission.MANAGE_INTERNAL_USERS,
+            Permission.MANAGE_PARTIES,
+            Permission.VIEW_PARTIES,
+            Permission.VIEW_CURRENT_CONTEXT), true),
+    ANALYST(Set.of(
+            Permission.MANAGE_PARTIES,
+            Permission.VIEW_PARTIES,
+            Permission.VIEW_CURRENT_CONTEXT), true),
     BROKER(Set.of(Permission.VIEW_CURRENT_CONTEXT), false),
     CLIENT(Set.of(Permission.VIEW_CURRENT_CONTEXT), false),
     SELLER(Set.of(Permission.VIEW_CURRENT_CONTEXT), false),

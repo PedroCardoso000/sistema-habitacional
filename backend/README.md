@@ -56,6 +56,19 @@ Endpoints da entrega de identidade e autorização:
 - `POST /api/organizations/{organizationId}/users/{userId}/revocation`
 - `POST /api/platform/organizations`
 
+Endpoints de participantes e parceiros:
+
+- `POST /api/organizations/{organizationId}/parties/clients`
+- `POST /api/organizations/{organizationId}/parties/clients/search`
+- `POST /api/organizations/{organizationId}/parties/brokers`
+- `POST /api/organizations/{organizationId}/parties/agencies`
+- `PUT /api/organizations/{organizationId}/parties/brokers/{brokerId}/agency`
+- `PATCH /api/organizations/{organizationId}/parties/{type}/{partyId}/contact`
+- `PUT /api/organizations/{organizationId}/parties/partners/{type}/{partnerId}/status`
+- `GET /api/organizations/{organizationId}/parties?type=CLIENT&page=0&size=20`
+
+Os valores de `type` são `CLIENT`, `BROKER` ou `AGENCY`; para alteração de status são aceitos `BROKER` e `AGENCY`. CPF e CNPJ são dados restritos usados apenas no cadastro, busca autorizada e prevenção de duplicidade. Eles não são retornados nas respostas nem gravados nas trilhas de auditoria.
+
 O contrato detalhado, incluindo requests, responses e erros RFC 9457, é gerado em `GET /v3/api-docs`.
 
 ## Bootstrap inicial
@@ -87,4 +100,4 @@ Credenciais padrão existem somente para desenvolvimento local. Ambientes reais 
 
 ## Limites atuais
 
-Não existem autenticação federada real, entidades de processo, storage de documentos ou notificações. Corretor, cliente e vendedor estão representados como papéis, mas seus cadastros e vínculos funcionais não são criados nesta entrega. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.
+Não existem autenticação federada real, entidades de processo, storage de documentos ou notificações. Clientes, corretores e imobiliárias pertencem exclusivamente à empresa que os cadastrou; ainda não existem vínculos com processos. O Event Publication Registry garante entrega aos listeners transacionais registrados; não é event store nem timeline.
